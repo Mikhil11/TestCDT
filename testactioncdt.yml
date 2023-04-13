@@ -1,0 +1,47 @@
+# This Github action helps user test their Toolbox against different matlab release
+
+name: Run matlab test with two different releases and compare result
+# Controls when the workflow will run for this
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches:
+      - development
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# run a simple script on latest MATLAB release and access the variable from other MATLAB release
+
+jobs:
+  # This workflow contains a single job called "test"
+  test:
+    name: Create a struct variable for latest MATLAB release
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout CDT development branch
+        uses: actions/checkout@v3
+        with:
+          repository: Mikhil11/TestCDT
+          path: development
+
+      - name: Checkout smoke testing repo
+        run: |
+          git clone https://github.com/Mikhil11/smokeTesting.git
+      
+      - name: Create text file
+        uses: "finnp/create-file-action@master"
+        env:
+          FILE_NAME: "fileName.txt"
+          FILE_DATA: "file content"
+      
+      # Commit test html file to repository
+      - name: commit test report
+        if: always()
+        continue-on-error: true
+        run: |
+          cd development
+          git remote -v
