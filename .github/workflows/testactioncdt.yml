@@ -32,11 +32,25 @@ jobs:
         run: |
           git clone https://github.com/Mikhil11/smokeTesting.git
       
-      - name: Create text file
-        uses: "finnp/create-file-action@master"
-        env:
-          FILE_NAME: "development/test2.txt"
-          FILE_DATA: "file content"
+      - name: Set up new MATLAB release
+        uses: matlab-actions/setup-matlab@v1
+
+      # Run runtest script
+      - name: Run test with latest MATLAB
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport;
+      
+      - name: Set up old MATLAB release
+        uses: matlab-actions/setup-matlab@v1
+        with:
+          release: R2022b
+
+      # Rerun runtest script with old MATLAB release and tabulate results
+      - name: run test with old MATLAB release
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport1;
       
       # Commit test html file to repository
       - name: commit test report
@@ -47,8 +61,6 @@ jobs:
           git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           git remote add development https://github.com/Mikhil11/TestCDT.git
           git remote -v
-          git add test2.txt
-          git status
+          git add test1.html
           git commit -m "new testing commit"
-          git status
           git push -u origin development
