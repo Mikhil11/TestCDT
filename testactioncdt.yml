@@ -35,7 +35,7 @@ jobs:
       - name: Create text file
         uses: "finnp/create-file-action@master"
         env:
-          FILE_NAME: "fileName.txt"
+          FILE_NAME: "development/test2.txt"
           FILE_DATA: "file content"
       
       # Commit test html file to repository
@@ -45,3 +45,6 @@ jobs:
         run: |
           cd development
           git remote -v
+          git add "development/test2.txt"
+          git commit -m "new testing commit"
+          git push -u origin development
