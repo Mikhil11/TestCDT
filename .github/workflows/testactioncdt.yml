@@ -43,8 +43,8 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           cd development
+          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           git remote -v
           git add test2.txt
           git status
