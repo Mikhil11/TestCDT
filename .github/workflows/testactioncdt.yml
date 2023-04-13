@@ -1,6 +1,6 @@
 # This Github action helps user test their Toolbox against different matlab release
 
-name: Run matlab test with two different releases and compare result
+name: Run matlab test with two different releases and compare result in html format
 # Controls when the workflow will run for this
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
