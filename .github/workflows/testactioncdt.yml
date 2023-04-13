@@ -45,6 +45,8 @@ jobs:
         run: |
           cd development
           git remote -v
-          git add "development/test2.txt"
+          git add test2.txt
+          git status
           git commit -m "new testing commit"
+          git status
           git push -u origin development
