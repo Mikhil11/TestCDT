@@ -62,7 +62,7 @@ jobs:
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),disp(resultComparisonReport),generateHtmlTestReport('mystructfilenew.mat');
+          command: load('mystructfilenew.mat'),addpath('smokeTesting'),addpath(genpath('development/cdt')),disp(resultComparisonReport),generateHtmlTestReport('mystructfilenew.mat');
           
       # Commit test html file to repository
       - name: commit test report
