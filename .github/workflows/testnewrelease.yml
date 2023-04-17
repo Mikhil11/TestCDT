@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport(" ${{ matrix.MATLABVersion }}");
+          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
           
       - name: Upload MAT file
         uses: actions/upload-artifact@v3
