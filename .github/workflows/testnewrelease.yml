@@ -18,24 +18,65 @@ jobs:
   # 1. a matrixed test job run across a bunch of releases of MATLAB
   # 2. a reporting script which generates and html to show diff reports
   test:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         MATLABVersion: [R2022b, R2023a]
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+        include:
+          - MATLABVersion: R2023a
+            reportGenerate: 1
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout CDT development branch
+        uses: actions/checkout@v3
+        with:
+          repository: Mikhil11/TestCDT
+          path: development
 
-      - name: Set up MATLAB
+      - name: Checkout smoke testing repo
+        run: |
+          git clone https://github.com/Mikhil11/smokeTesting.git
+      
+      - name: Set up new MATLAB release
         uses: matlab-actions/setup-matlab@v1
         with:
           release: ${{ matrix.MATLABVersion }}
+          
+      - name: Download MAT file
+        if: ${{ matrix.reportGenerate }}
+        uses: actions/download-artifact@v3
+        with:
+          name: save-mat-file
 
       # Runs all tests in the project.  Put results in a version specific subdirectory
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath("buildutil"),testToolbox('ReportSubdirectory',"${{ matrix.MATLABVersion }}")
+          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport(" ${{ matrix.MATLABVersion }}");
+          
+      - name: Upload MAT file
+        uses: actions/upload-artifact@v3
+        with:
+          name: save-mat-file
+          path: mystructfilenew.mat
+          
+      - name: Create HTML report
+        if: ${{ matrix.reportGenerate }}
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),generateHtmlTestReport('mystructfilenew.mat');
+          
+      # Commit test html file to repository
+      - name: commit test report
+        if: ${{ matrix.reportGenerate }}
+        continue-on-error: true
+        run: |
+          cd development
+          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
+          git remote add development https://github.com/Mikhil11/TestCDT.git
+          git remote -v
+          git add test1.html
+          git commit -m "new testing commit"
+          git push -u origin development
