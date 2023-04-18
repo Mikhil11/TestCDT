@@ -41,7 +41,7 @@ jobs:
           release: ${{ matrix.MATLABVersion }}
           
       - name: Download MAT file
-        if: ${{ matrix.reportGenerate }}
+        if: ${{ matrix.MATLABVersion }} != R2021a
         uses: actions/download-artifact@v3
         with:
           name: save-mat-file
