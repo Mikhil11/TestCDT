@@ -1,6 +1,6 @@
 # This is to test new workflow
 
-name: Run test with multiple MATLAB releases using matrix and get reports
+name: Run test with multiple MATLAB releases using matrix and get reports in html
 
 # Controls when the workflow will run
 on:
