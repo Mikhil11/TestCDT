@@ -42,7 +42,7 @@ jobs:
       - name: Create test results folder
         if: ${{ matrix.MATLABVersion == 'R2022b' }}
         run: |
-          mkdir('testresults')
+          mkdir testresults
 
           
       - name: Download MAT file
