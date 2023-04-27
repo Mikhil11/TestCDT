@@ -39,6 +39,12 @@ jobs:
         with:
           release: ${{ matrix.MATLABVersion }}
           
+      - name: Create test results folder
+        if: ${{ matrix.MATLABVersion == 'R2022b' }}
+        run: |
+          mkdir('testresults')
+
+          
       - name: Download MAT file
         if: ${{ matrix.MATLABVersion != 'R2022b' }}
         uses: actions/download-artifact@v3
@@ -49,7 +55,7 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('smokeTesting'),addpath(genpath('cdt')),mkdir('testresults'),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
+          command: addpath('smokeTesting'),addpath(genpath('cdt')),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
           
       # Commit test result to repository
       - name: commit test report to repo
@@ -57,7 +63,7 @@ jobs:
         run: |
           git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           git remote add development https://github.com/Mikhil11/TestCDT.git
-          git add testresults/${{ matrix.MATLABVersion }}/.
+          git add testresults/.
           git commit -m "new testing commit"
           git push -f origin development
           
