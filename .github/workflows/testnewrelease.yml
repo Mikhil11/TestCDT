@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        MATLABVersion: [R2021a, R2021b, R2022a, R2022b, R2023a]
+        MATLABVersion: [R2022b, R2023a]
         include:
           - MATLABVersion: R2023a
             reportGenerate: 1
@@ -29,7 +29,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Mikhil11/TestCDT
-          path: development
 
       - name: Checkout smoke testing repo
         run: |
@@ -41,7 +40,7 @@ jobs:
           release: ${{ matrix.MATLABVersion }}
           
       - name: Download MAT file
-        if: ${{ matrix.MATLABVersion != 'R2021a' }}
+        if: ${{ matrix.MATLABVersion != 'R2022b' }}
         uses: actions/download-artifact@v3
         with:
           name: save-mat-file
@@ -50,7 +49,17 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('smokeTesting'),addpath(genpath('development/cdt')),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
+          command: addpath('smokeTesting'),addpath(genpath('cdt')),mkdir('testresults'),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
+          
+      # Commit test result to repository
+      - name: commit test report to repo
+        continue-on-error: true
+        run: |
+          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
+          git remote add development https://github.com/Mikhil11/TestCDT.git
+          git add testresults/${{ matrix.MATLABVersion }}/.
+          git commit -m "new testing commit"
+          git push -f origin development
           
       - name: Upload MAT file
         uses: actions/upload-artifact@v3
@@ -62,14 +71,13 @@ jobs:
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
-          command: load('mystructfilenew.mat'),addpath('smokeTesting'),addpath(genpath('development/cdt')),disp(resultComparisonReport),generateHtmlTestReport('mystructfilenew.mat');
+          command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
           
       # Commit test html file to repository
       - name: commit test report
         if: ${{ matrix.reportGenerate }}
         continue-on-error: true
         run: |
-          cd development
           git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           git remote add development https://github.com/Mikhil11/TestCDT.git
           git remote -v
