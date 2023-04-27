@@ -41,6 +41,7 @@ jobs:
           
       - name: Create test results folder
         if: ${{ matrix.MATLABVersion == 'R2022b' }}
+        continue-on-error: true
         run: |
           mkdir testresults
 
