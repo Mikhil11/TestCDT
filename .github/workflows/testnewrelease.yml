@@ -58,6 +58,11 @@ jobs:
         with:
           command: addpath('smokeTesting'),addpath(genpath('cdt')),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
           
+      - name: list testresult folder contents
+        run: |
+          ls
+          ls testresults
+          
       - name: Upload MAT file
         uses: actions/upload-artifact@v3
         with:
