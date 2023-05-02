@@ -51,6 +51,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: save-test-results
+          path: testresults
 
       # Runs all tests in the project.  Put results in a version specific subdirectory
       - name: Run tests
