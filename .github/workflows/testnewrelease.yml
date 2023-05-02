@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        MATLABVersion: [R2022b, R2023a]
+        MATLABVersion: [R2021a, R2021b, R2022b, R2023a]
         include:
           - MATLABVersion: R2023a
             reportGenerate: 1
@@ -41,13 +41,13 @@ jobs:
 
           
       - name: Download MAT file
-        if: ${{ matrix.MATLABVersion != 'R2022b' }}
+        if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
         with:
           name: save-mat-file
           
       - name: Download testresults directory
-        if: ${{ matrix.MATLABVersion != 'R2022b' }}
+        if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
         with:
           name: save-test-results
@@ -90,7 +90,6 @@ jobs:
           git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
           git remote add development https://github.com/Mikhil11/TestCDT.git
           git remote -v
-          git add test1.html
           git add testresults/.
           git commit -m "new testing commit"
           git push -u origin development
