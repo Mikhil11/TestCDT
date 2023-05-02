@@ -38,12 +38,6 @@ jobs:
         uses: matlab-actions/setup-matlab@v1
         with:
           release: ${{ matrix.MATLABVersion }}
-          
-      - name: Create test results folder
-        if: ${{ matrix.MATLABVersion == 'R2022b' }}
-        continue-on-error: true
-        run: |
-          mkdir testresults
 
           
       - name: Download MAT file
@@ -51,6 +45,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: save-mat-file
+          
+      - name: Download testresults directory
+        if: ${{ matrix.MATLABVersion != 'R2022b' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: save-test-results
 
       # Runs all tests in the project.  Put results in a version specific subdirectory
       - name: Run tests
@@ -58,21 +58,17 @@ jobs:
         with:
           command: addpath('smokeTesting'),addpath(genpath('cdt')),runtestAndGenerateReport("${{ matrix.MATLABVersion }}");
           
-      # Commit test result to repository
-      - name: commit test report to repo
-        continue-on-error: true
-        run: |
-          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
-          git remote add development https://github.com/Mikhil11/TestCDT.git
-          git add testresults/.
-          git commit -m "new testing commit"
-          git push -f origin development
-          
       - name: Upload MAT file
         uses: actions/upload-artifact@v3
         with:
           name: save-mat-file
           path: mystructfilenew.mat
+          
+      - name: Upload test folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: save-test-results
+          path: testresults/
           
       - name: Create HTML report
         if: ${{ matrix.reportGenerate }}
@@ -89,5 +85,6 @@ jobs:
           git remote add development https://github.com/Mikhil11/TestCDT.git
           git remote -v
           git add test1.html
+          git add testresults/.
           git commit -m "new testing commit"
           git push -u origin development
