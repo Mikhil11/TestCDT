@@ -1,0 +1,95 @@
+# This is to test new workflow
+
+name: Run test with multiple MATLAB releases using matrix and get reports in html
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches:
+      - development      
+      
+jobs:
+  # This workflow contains:
+  # 1. a matrixed test job run across a bunch of releases of MATLAB
+  # 2. a reporting script which generates and html to show diff reports
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        MATLABVersion: [R2021a, R2021b, R2022a, R2022b, R2023a]
+        include:
+          - MATLABVersion: R2023a
+            reportGenerate: 1
+
+    steps:
+      - name: Checkout CDT development branch
+        uses: actions/checkout@v3
+        with:
+          repository: Mikhil11/TestCDT
+
+      - name: Checkout smoke testing repo
+        run: |
+          git clone https://github.com/Mikhil11/smokeTesting1.git
+      
+      - name: Set up new MATLAB release
+        uses: matlab-actions/setup-matlab@v1
+        with:
+          release: ${{ matrix.MATLABVersion }}
+
+          
+      - name: Download MAT file
+        if: ${{ matrix.MATLABVersion != 'R2021a' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: save-mat-file
+          
+      - name: Download testresults directory
+        if: ${{ matrix.MATLABVersion != 'R2021a' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: save-test-results
+          path: testresults
+
+      # Runs all tests in the project.  Put results in a version specific subdirectory
+      - name: Run tests
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addpath('smokeTesting1'),addpath(genpath('cdt')),runRapidTester("${{ matrix.MATLABVersion }}");
+          
+      - name: list testresult folder contents
+        run: |
+          ls
+          ls testresults
+          
+      - name: Upload MAT file
+        uses: actions/upload-artifact@v3
+        with:
+          name: save-mat-file
+          path: mystructfilenew.mat
+          
+      - name: Upload test folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: save-test-results
+          path: testresults/
+          
+      - name: Create HTML report
+        if: ${{ matrix.reportGenerate }}
+        uses: matlab-actions/run-command@v1
+        with:
+          command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
+          
+      # Commit test html file to repository
+      - name: Commit test report
+        if: ${{ matrix.reportGenerate }}
+        continue-on-error: true
+        run: |
+          git config --global user.email "mikhils@mathworks.com" && git config --global user.name "Mikhil11"
+          git remote add development https://github.com/Mikhil11/TestCDT.git
+          git remote -v
+          git add testresults/.
+          git commit -m "new testing commit"
+          git push -u origin development
