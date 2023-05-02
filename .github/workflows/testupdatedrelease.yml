@@ -1,6 +1,6 @@
 # This is to test new workflow
 
-name: Run test with multiple MATLAB releases using matrix and get reports in html
+name: Use updated smoke test tool to get multiple MATLAB release reports
 
 # Controls when the workflow will run
 on:
