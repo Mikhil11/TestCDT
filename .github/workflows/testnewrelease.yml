@@ -83,7 +83,7 @@ jobs:
           command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
           
       # Commit test html file to repository
-      - name: commit test report
+      - name: Commit test report
         if: ${{ matrix.reportGenerate }}
         continue-on-error: true
         run: |
