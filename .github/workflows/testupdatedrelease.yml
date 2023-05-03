@@ -32,7 +32,7 @@ jobs:
 
       - name: Checkout smoke testing repo
         run: |
-          git clone https://github.com/Mikhil11/smokeTesting1.git
+          git clone https://github.com/Mikhil11/smokeTesting.git
       
       - name: Set up new MATLAB release
         uses: matlab-actions/setup-matlab@v1
@@ -57,7 +57,7 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('smokeTesting1'),addpath(genpath('cdt')),runRapidTester("${{ matrix.MATLABVersion }}");
+          command: addpath('smokeTesting'),addpath(genpath('cdt')),runRapidTester("${{ matrix.MATLABVersion }}");
           
       - name: list testresult folder contents
         run: |
@@ -80,7 +80,7 @@ jobs:
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
-          command: load('mystructfilenew.mat'),addpath('smokeTesting1'),generateHtmlTestReport('mystructfilenew.mat');
+          command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
           
       # Commit test html file to repository
       - name: Commit test report
