@@ -1,6 +1,6 @@
 # This workflow helps in testing MATLAB toolbox for multiple releases using smoke test tool
 
-name: Use smoke test tool to test toolbox against different MATLAB release
+name: Use smoke test tool to test toolbox against different MATLAB release and generate report
 
 # Controls when the workflow will run
 on:
