@@ -1,4 +1,5 @@
 # This workflow helps in testing MATLAB toolbox for multiple releases using smoke test tool
+# All files are added in the development branch of TestCDT report
 
 name: Use smoke test tool to test toolbox against different MATLAB release and generate report
 
