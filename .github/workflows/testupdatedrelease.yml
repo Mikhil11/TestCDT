@@ -41,6 +41,7 @@ jobs:
 
       # This mat file contains Failed test results object for different MATLAB release   
       - name: Download MAT file
+        # Nothing to download for the first case
         if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
         with:
@@ -48,6 +49,7 @@ jobs:
        
       # Individual test reports for a given MATLAB release is stored in testresults folder
       - name: Download testresults directory
+        # Nothing to download for the first case
         if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
         with:
@@ -74,14 +76,14 @@ jobs:
           name: save-test-results
           path: testresults/
        
-      # All failed results are stored in the MAT file which is loaded here and comparison html report is generated using generateHtmlTestreport.
+      # All failed results are stored in the MAT file which is loaded here and comparison html report is generated using generateHtmlTestreport.m function
       - name: Create HTML report
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
           command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
           
-      # Commit all testresults into the repository
+      # Commit all testresults and diff html report into the repository
       - name: Commit test report
         if: ${{ matrix.reportGenerate }}
         continue-on-error: true
