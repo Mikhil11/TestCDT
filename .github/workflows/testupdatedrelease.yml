@@ -80,7 +80,7 @@ jobs:
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
-          command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
+          command: load('mystructfilenew.mat'),addpath('smokeTesting1'),generateHtmlTestReport('mystructfilenew.mat');
           
       # Commit test html file to repository
       - name: Commit test report
