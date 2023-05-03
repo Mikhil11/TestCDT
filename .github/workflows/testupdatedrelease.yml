@@ -1,10 +1,10 @@
-# This is to test new workflow
+# This workflow helps in testing MATLAB toolbox for multiple releases using smoke test tool
 
-name: Use updated smoke test tool to get multiple MATLAB release reports
+name: Use smoke test tool to test toolbox against different MATLAB release
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # Triggers the workflow on push or pull request events but only for the "developmentn" branch
   push:
     branches:
       - development      
@@ -12,7 +12,7 @@ on:
 jobs:
   # This workflow contains:
   # 1. a matrixed test job run across a bunch of releases of MATLAB
-  # 2. a reporting script which generates and html to show diff reports
+  # 2. a reporting script which generates diff reports to show failed test comparison and individual diff reports
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -25,7 +25,7 @@ jobs:
             reportGenerate: 1
 
     steps:
-      - name: Checkout CDT development branch
+      - name: Checkout CDT branch
         uses: actions/checkout@v3
         with:
           repository: Mikhil11/TestCDT
@@ -39,13 +39,14 @@ jobs:
         with:
           release: ${{ matrix.MATLABVersion }}
 
-          
+      # This mat file contains Failed test results object for different MATLAB release   
       - name: Download MAT file
         if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
         with:
           name: save-mat-file
-          
+       
+      # Individual test reports for a given MATLAB release is stored in testresults folder
       - name: Download testresults directory
         if: ${{ matrix.MATLABVersion != 'R2021a' }}
         uses: actions/download-artifact@v3
@@ -53,36 +54,34 @@ jobs:
           name: save-test-results
           path: testresults
 
-      # Runs all tests in the project.  Put results in a version specific subdirectory
+      # Runs all the doc scripts in cdt/doc folder.  The test results are added to 'testresults' folder
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
           command: addpath('smokeTesting'),addpath(genpath('cdt')),runRapidTester("${{ matrix.MATLABVersion }}");
           
-      - name: list testresult folder contents
-        run: |
-          ls
-          ls testresults
-          
+      # The uploaded mat file contains Failed test results object for different MATLAB release. The details are in runRapidTester.m file     
       - name: Upload MAT file
         uses: actions/upload-artifact@v3
         with:
           name: save-mat-file
           path: mystructfilenew.mat
-          
+      
+      # Test results for each MATLAB version is uploaded
       - name: Upload test folder
         uses: actions/upload-artifact@v3
         with:
           name: save-test-results
           path: testresults/
-          
+       
+      # All failed results are stored in the MAT file which is loaded here and comparison html report is generated using generateHtmlTestreport.
       - name: Create HTML report
         if: ${{ matrix.reportGenerate }}
         uses: matlab-actions/run-command@v1
         with:
           command: load('mystructfilenew.mat'),addpath('smokeTesting'),generateHtmlTestReport('mystructfilenew.mat');
           
-      # Commit test html file to repository
+      # Commit all testresults into the repository
       - name: Commit test report
         if: ${{ matrix.reportGenerate }}
         continue-on-error: true
